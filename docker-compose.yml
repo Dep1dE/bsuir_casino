@@ -34,6 +34,7 @@ services:
     ports:
       - 8080:8080
   solana:
+    image: ${SOLANA_IMAGE:-}
     build:
       context: ./solana-validator
       dockerfile: Dockerfile
