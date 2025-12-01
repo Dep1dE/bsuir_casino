@@ -40,13 +40,14 @@ services:
       dockerfile: Dockerfile
     container_name: solana-test-validator
     ports:
-      - "8899:8899"  # RPC
-      - "8900:8900"  # WebSocket
-      - "8001:8001"  # Gossip
-      - "8002:8002"  # TPU
-      - "8003:8003"  # TPU
+      - "8899:8899"
+      - "8900:8900"
+      - "8001:8001"
+      - "8002:8002"
+      - "8003:8003"
     volumes:
       - solana_data:/root/.local/share/solana
+    command: ["solana-test-validator", "--bind-address", "0.0.0.0", "--rpc-port", "8899", "--ledger", "/root/.local/share/solana", "--faucet-sol", "1000000", "--limit-ledger-size"]
     healthcheck:
       test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/localhost/8899' || exit 1"]
       interval: 10s
@@ -54,6 +55,14 @@ services:
       retries: 10
       start_period: 60s
     restart: unless-stopped
+    shm_size: 2gb
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
 volumes:
   database_data:
     driver: local
