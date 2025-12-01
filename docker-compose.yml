@@ -1,0 +1,60 @@
+services:
+  casino.api:
+    image: ${DOCKER_REGISTRY-}casinoapi
+    build:
+      context: ./src
+      dockerfile: Casino.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5000:8080" 
+      - "5001:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+      solana:
+        condition: service_healthy
+  db:
+    image: postgres:latest
+    restart: always
+    environment:    
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: admin
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+  solana:
+    build:
+      context: ./solana-validator
+      dockerfile: Dockerfile
+    container_name: solana-test-validator
+    ports:
+      - "8899:8899"  # RPC
+      - "8900:8900"  # WebSocket
+      - "8001:8001"  # Gossip
+      - "8002:8002"  # TPU
+      - "8003:8003"  # TPU
+    volumes:
+      - solana_data:/root/.local/share/solana
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/localhost/8899' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+volumes:
+  database_data:
+    driver: local
+  solana_data:
+    driver: local
