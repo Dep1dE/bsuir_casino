@@ -6,9 +6,9 @@ services:
       dockerfile: Casino.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
     ports:
       - "5000:8080" 
-      - "5001:8081"
     depends_on:
       db:
         condition: service_healthy
