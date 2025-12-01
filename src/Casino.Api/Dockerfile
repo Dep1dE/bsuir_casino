@@ -24,7 +24,9 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Casino.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Casino.Api.dll"]
+COPY --from=build /src/Casino.Api/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh
+ENTRYPOINT ["./docker-entrypoint.sh"]

@@ -47,7 +47,7 @@ services:
       - "8003:8003"
     volumes:
       - solana_data:/root/.local/share/solana
-    command: ["solana-test-validator", "--bind-address", "0.0.0.0", "--rpc-port", "8899", "--ledger", "/root/.local/share/solana", "--faucet-sol", "1000000", "--limit-ledger-size", "--reset"]
+    command: ["solana-test-validator", "--bind-address", "0.0.0.0", "--rpc-port", "8899", "--ledger", "/root/.local/share/solana", "--faucet-sol", "1000000", "--limit-ledger-size"]
     healthcheck:
       test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/localhost/8899' || exit 1"]
       interval: 10s
