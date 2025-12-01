@@ -41,8 +41,6 @@ builder.Services.AddScoped<IBetService, BetService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<CasinoDbContext>();
     try
@@ -54,12 +52,11 @@ if (app.Environment.IsDevelopment())
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         logger.LogWarning(ex, "Failed to apply migrations. Database might not be available yet.");
     }
-}
+
 
 app.UseCors();
 
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
@@ -67,7 +64,6 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
     app.MapOpenApi();
-}
 
 
 app.UseAuthorization();
