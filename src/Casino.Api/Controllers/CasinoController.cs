@@ -46,11 +46,6 @@ public class CasinoController : ControllerBase
 
         var result = await _walletService.CreateWalletAsync(request.TelegramId, cancellationToken);
 
-        if (!result.Success && result.WalletAddress != null)
-        {
-            return Conflict(result);
-        }
-
         if (!result.Success)
         {
             return BadRequest(result);

@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   casino.api:
     image: ${DOCKER_REGISTRY-}casinoapi
@@ -8,16 +10,17 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
     ports:
-      - "5000:8080" 
+      - "5000:8080"
     depends_on:
       db:
         condition: service_healthy
       solana:
         condition: service_healthy
+
   db:
     image: postgres:16
     restart: always
-    environment:    
+    environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: admin
@@ -27,12 +30,14 @@ services:
       test: ["CMD-SHELL", "pg_isready -U admin"]
       interval: 5s
       timeout: 5s
-      retries: 5 
+      retries: 5
+
   adminer:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - "8080:8080"
+
   solana:
     image: ${SOLANA_IMAGE:-}
     build:
@@ -63,9 +68,23 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-      stack:            
-        soft: -1       
+      stack:
+        soft: -1
         hard: -1
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command: http casino.api:8080
+    environment:
+      NGROK_AUTHTOKEN: "36ZNI6yMmFgs8y60bWmnBOuRIkC_qQtN5kTErsBZuLBXnMt3"
+    ports:
+      - "4040:4040" 
+    depends_on:
+      - casino.api
+    networks:
+      - default
+
 volumes:
   database_data:
     driver: local

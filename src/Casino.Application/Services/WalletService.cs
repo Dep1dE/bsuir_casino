@@ -34,10 +34,10 @@ public class WalletService : IWalletService
             if (existingWallet != null)
             {
                 return new CreateWalletResponse(
-                    Success: false,
+                    Success: true,
                     WalletAddress: existingWallet.WalletAddress,
                     Balance: existingWallet.Balance,
-                    Message: "Wallet already exists for this Telegram ID"
+                    Message: null
                 );
             }
 

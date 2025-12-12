@@ -151,21 +151,32 @@ public class BetService : IBetService
         var slotElements = new[] { "bar", "bell", "cherry", "club", "diamond", "heart", 
             "lemon", "orange", "plum", "seven", "spade", "star" };
 
-        var combination = new List<string>
-        {
-            slotElements[_random.Next(slotElements.Length)],
-            slotElements[_random.Next(slotElements.Length)],
-            slotElements[_random.Next(slotElements.Length)]
-        };
-
-        var isWin = combination[0] == combination[1] && combination[1] == combination[2];
+        // 30% chance to win
+        var isWin = _random.Next(100) < 30;
         
+        List<string> combination;
         decimal winAmount = 0m;
+
         if (isWin)
         {
-            var element = combination[0];
-            var multiplier = GetSlotMultiplier(element);
+            // Generate winning combination (all three elements the same)
+            var winningElement = slotElements[_random.Next(slotElements.Length)];
+            combination = new List<string> { winningElement, winningElement, winningElement };
+            var multiplier = GetSlotMultiplier(winningElement);
             winAmount = betAmount * multiplier;
+        }
+        else
+        {
+            // Generate losing combination (not all three elements the same)
+            var firstElement = slotElements[_random.Next(slotElements.Length)];
+            var secondElement = slotElements[_random.Next(slotElements.Length)];
+            // Ensure third element is different from at least one of the first two
+            var thirdElement = slotElements[_random.Next(slotElements.Length)];
+            while (firstElement == secondElement && secondElement == thirdElement)
+            {
+                thirdElement = slotElements[_random.Next(slotElements.Length)];
+            }
+            combination = new List<string> { firstElement, secondElement, thirdElement };
         }
 
         return (combination, winAmount);
